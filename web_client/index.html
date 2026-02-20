@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voting System Test</title>
+    <!--
+    FRONTEND ARCHITECTURE NOTES:
+    ============================
+    
+    This is a simple test client. In production:
+    
+    1. SERVING OPTIONS:
+       a) Serve from Express (current setup) - nginx proxies to Express which serves static files
+       b) Serve from nginx directly - faster, add to nginx.conf:
+          location /static/ {
+              root /path/to/web_client;
+          }
+       c) Separate frontend server (React/Vue build) - nginx proxies different paths
+    
+    2. API CALLS:
+       - Always use relative URLs (/api/bet) not absolute (http://localhost:3001/api/bet)
+       - This way nginx handles load balancing transparently
+       - The frontend doesn't know/care which backend instance responds
+    
+    3. STICKY SESSIONS (ip_hash):
+       - With ip_hash: same user always hits same server (good for sessions)
+       - Without ip_hash: round-robin, need shared session store (Redis)
+    
+    
+    -->
+</head>
+<body>
+    <h1>Voting System - API Test</h1>
+    
+    <button id="fetchBet">Fetch Current Bet</button>
+    <button id="checkHealth">Check Health</button>
+    <button id="fetchMultiple">Fetch 5x (test load balancing)</button>
+    <button id="voteYes">Vote Yes</button>
+    <button id="voteNo">Vote No</button>
+    
+    <h2>Response:</h2>
+    <pre id="output">Click a button to test the API</pre>
+
+    <script src="app.js"></script>
+</body>
+</html>

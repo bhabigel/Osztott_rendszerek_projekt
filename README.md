@@ -6,6 +6,95 @@ Implementation of a **distributed voting system** that enables audiences to resp
 
 ---
 
+## Start Guide
+
+### Prerequisites (All Platforms)
+
+- **Node.js** 18+ ([download](https://nodejs.org))
+- **Git** ([download](https://git-scm.com))
+
+### macOS Setup
+
+```bash
+# 1. Clone and install dependencies
+git clone https://github.com/bhabigel/Osztott_rendszerek_projekt.git
+cd Osztott_rendszerek_projekt
+npm install
+
+# 2. Run setup script (installs nginx via Homebrew)
+npm run setup:mac
+
+# 3. Start everything
+npm run start:all:mac
+
+# 4. Open in browser
+open http://localhost:8081
+```
+
+### Windows Setup
+
+```powershell
+# 1. Install nginx manually
+# Download from: https://nginx.org/en/download.html
+# Extract to C:\nginx
+
+# 2. Clone and install dependencies
+git clone https://github.com/bhabigel/Osztott_rendszerek_projekt.git
+cd Osztott_rendszerek_projekt
+npm install
+
+# 3. Run setup script (PowerShell as Administrator)
+npm run setup:win
+
+# 4. Start everything
+npm run start:all:win
+
+# 5. Open in browser
+start http://localhost:8081
+```
+
+### NPM Scripts Reference
+
+| Command | Description |
+|---------|-------------|
+| `npm run start:pm2` | Start all PM2 server instances |
+| `npm run stop:pm2` | Stop all PM2 instances |
+| `npm run restart:pm2` | Restart all PM2 instances |
+| `npm run logs` | View PM2 logs |
+| `npm run status` | Check PM2 instance status |
+| `npm run start:nginx:mac` | Start nginx (macOS) |
+| `npm run start:nginx:win` | Start nginx (Windows) |
+| `npm run stop:nginx:mac` | Stop nginx (macOS) |
+| `npm run stop:nginx:win` | Stop nginx (Windows) |
+| `npm run start:all:mac` | Start PM2 + nginx (macOS) |
+| `npm run start:all:win` | Start PM2 + nginx (Windows) |
+| `npm run stop:all:mac` | Stop everything (macOS) |
+| `npm run stop:all:win` | Stop everything (Windows) |
+| `npm run health` | Test load balancer health |
+
+### Testing Load Balancing
+
+```bash
+# Test that requests are distributed across instances
+curl http://localhost:8081/health
+curl http://localhost:8081/api/bet
+
+# The response includes _debug.port showing which instance handled the request
+```
+
+### Architecture Overview
+
+```
+┌─────────┐     ┌───────────────┐     ┌─────────────────┐
+│ Browser │────▶│ nginx (:8081) │────▶│ PM2 Instance A  │──┐
+└─────────┘     │ Load Balancer │────▶│ PM2 Instance B  │──┼──▶ [Database]
+                │   (ip_hash)   │────▶│ PM2 Instance C  │──┘
+                └───────────────┘     └─────────────────┘
+                                      (ports 3001-3003)
+```
+
+---
+
 ## System Architecture
 
 ### Main Components

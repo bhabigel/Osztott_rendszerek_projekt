@@ -1,0 +1,57 @@
+{
+  "name": "osztott_rendszerek_projekt",
+  "version": "1.0.0",
+  "description": "Implementation of a **distributed voting system** that enables audiences to respond to questions concurrently over the internet. Votes are stored in a central database, and results are displayed in real-time on a display application.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    
+    "start:pm2": "cd server && npx pm2 start ecosystem.config.js",
+    "stop:pm2": "npx pm2 stop all",
+    "restart:pm2": "npx pm2 restart all",
+    "delete:pm2": "npx pm2 delete all",
+    "logs": "npx pm2 logs",
+    "status": "npx pm2 status",
+    
+    "start:nginx:mac": "brew services start nginx",
+    "stop:nginx:mac": "brew services stop nginx",
+    "restart:nginx:mac": "brew services restart nginx",
+    "reload:nginx:mac": "nginx -s reload",
+    
+    "start:nginx:win": "cd C:\\nginx && start nginx",
+    "stop:nginx:win": "cd C:\\nginx && nginx -s quit",
+    "reload:nginx:win": "cd C:\\nginx && nginx -s reload",
+    
+    "start:all:mac": "npm run start:pm2 && npm run start:nginx:mac",
+    "stop:all:mac": "npm run stop:nginx:mac && npm run stop:pm2",
+    
+    "start:all:win": "npm run start:pm2 && npm run start:nginx:win",
+    "stop:all:win": "npm run stop:nginx:win && npm run stop:pm2",
+    
+    "setup:mac": "cd server && chmod +x setup-macos.sh && ./setup-macos.sh",
+    "setup:win": "powershell -ExecutionPolicy Bypass -File server/setup-windows.ps1",
+    
+    "health": "curl -s http://localhost:8081/health",
+    "test:loadbalance": "for i in 1 2 3 4 5; do curl -s http://localhost:8081/health; echo ''; done"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bhabigel/Osztott_rendszerek_projekt.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/bhabigel/Osztott_rendszerek_projekt/issues"
+  },
+  "homepage": "https://github.com/bhabigel/Osztott_rendszerek_projekt#readme",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "pm2": "^6.0.14"
+  }
+}
