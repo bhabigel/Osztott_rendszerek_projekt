@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="com">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Szavazasi Eredmenyek lekerdezese</title>
+    <link rel="stylesheet" href="results.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>
+            Szavazasi Eredmenyek
+        </h1>
+
+        <!--Keresesi resz-->
+        <div class="search-section">
+            <label for="pollId">Szavazasi ID:</label>
+            <input type="text"
+                id="pollId"
+                placeholder="pl. POLL_ID"
+                value="POLL_ID">
+            <button id="searchBtn">Kereses</button>
+        </div>
+
+        <!--Toltesi jelzes-->
+        <div id="loading" class="loading hidden">
+            Betoltes...
+        </div>
+
+        <!--Hiba uzenet-->
+        <div id="error" class="error hidden"></div>
+
+        <!--Eredmenyek terulet-->
+        <div id="resultsContainer" class="results-container hidden">
+            <h2 id="questionTitle"></h2>
+            <p id="pollStatus"></p>
+            <p id="totalVotes"></p>
+
+            <!--Tablazat az eredmenyekhez-->
+            <table id="resultsTable" class="results-table">
+                <thread>
+                    <tr>
+                        <th>Lehetoseg</th>
+                        <th>Szavazatok</th>
+                        <th>Szazakek</th>
+                        <th>Grafikon</th>
+                    </tr>
+                </thread>
+                <tbody id="resultsBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="js/results.js"></script>
+</body>
+</html>
