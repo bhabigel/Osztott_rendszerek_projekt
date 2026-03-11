@@ -130,6 +130,36 @@ curl http://localhost:8081/api/bet
 
 ---
 
+## Database Schemas (MongoDB)
+
+### **User Schema**
+Represents an authenticated user or administrator.
+- `username`: String (Unique)
+- `email`: String (Unique)
+- `passwordHash`: String 
+- `role`: `'user'` | `'admin'`
+- `isActive`: Boolean
+- `createdAt`: Date
+
+### **Bet Schema**
+Represents a voting topic or question.
+- `question`: String (Required)
+- `options`: String Array (Required)
+- `isActive`: Boolean (Default: true)
+- `createdAt`: Date
+- `closesAt`: Date 
+- `createdBy`: ObjectId (Ref: User)
+
+### **Vote Schema**
+Represents a single vote cast for a bet.
+- `betId`: ObjectId (Ref: Bet, Required)
+- `option`: String (Must match one of Bet options)
+- `userId`: ObjectId (Ref: User, Sparse Unique)
+- `visitorId`: String (IP Hash/Session ID, Sparse Unique)
+- `votedAt`: Date
+
+---
+
 ## Task Breakdown (9-Member Team)
 
 ### **1. Server Application Setup**

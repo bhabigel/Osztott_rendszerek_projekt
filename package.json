@@ -5,32 +5,26 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    
     "start:pm2": "cd server && npx pm2 start ecosystem.config.js",
     "stop:pm2": "npx pm2 stop all",
     "restart:pm2": "npx pm2 restart all",
     "delete:pm2": "npx pm2 delete all",
     "logs": "npx pm2 logs",
     "status": "npx pm2 status",
-    
     "start:nginx:mac": "brew services start nginx",
     "stop:nginx:mac": "brew services stop nginx",
     "restart:nginx:mac": "brew services restart nginx",
     "reload:nginx:mac": "nginx -s reload",
-    
     "start:nginx:win": "cd C:\\nginx && start nginx",
     "stop:nginx:win": "cd C:\\nginx && nginx -s quit",
     "reload:nginx:win": "cd C:\\nginx && nginx -s reload",
-    
     "start:all:mac": "npm run start:pm2 && npm run start:nginx:mac",
     "stop:all:mac": "npm run stop:nginx:mac && npm run stop:pm2",
-    
     "start:all:win": "npm run start:pm2 && npm run start:nginx:win",
     "stop:all:win": "npm run stop:nginx:win && npm run stop:pm2",
-    
     "setup:mac": "cd server && chmod +x setup-macos.sh && ./setup-macos.sh",
     "setup:win": "powershell -ExecutionPolicy Bypass -File server/setup-windows.ps1",
-    
+    "seed": "node database/seed.js",
     "health": "curl -s http://localhost:8081/health",
     "test:loadbalance": "for i in 1 2 3 4 5; do curl -s http://localhost:8081/health; echo ''; done"
   },
@@ -49,7 +43,8 @@
   "dependencies": {
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "mongoose": "^9.3.0"
   },
   "devDependencies": {
     "pm2": "^6.0.14"
