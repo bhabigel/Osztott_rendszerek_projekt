@@ -24,6 +24,7 @@
     "stop:all:win": "npm run stop:nginx:win && npm run stop:pm2",
     "setup:mac": "cd server && chmod +x setup-macos.sh && ./setup-macos.sh",
     "setup:win": "powershell -ExecutionPolicy Bypass -File server/setup-windows.ps1",
+    "start": "concurrently --names \"WEB,JSONFILE,DISPLAY\" --prefix-colors \"cyan,yellow,green\" \"node server/server.js\" \"node database/jsonfile-server/server.js\" \"python display/display.py\"",
     "seed": "node database/seed.js",
     "start:jsonfile-server": "node database/jsonfile-server/server.js",
     "start:display": "python display/display.py",
@@ -52,6 +53,7 @@
     "mysql2": "^3.11.0"
   },
   "devDependencies": {
+    "concurrently": "^9.2.1",
     "pm2": "^6.0.14"
   }
 }
