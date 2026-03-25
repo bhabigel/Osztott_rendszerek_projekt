@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Szavazás – Szavazó Rendszer</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<nav>
+    <a class="nav-brand" href="/index.html">Szavazó Rendszer</a>
+    <div class="nav-links">
+        <a href="/index.html">Főoldal</a>
+        <a href="/vote.html" class="active">Szavazás</a>
+        <a href="/results.html">Eredmények</a>
+        <a href="/admin.html">Admin</a>
+        <a href="/login.html" id="nav-login">Bejelentkezés</a>
+        <a href="/register.html" id="nav-register">Regisztráció</a>
+        <div id="nav-user" style="display:none; align-items:center; gap:8px;">
+            <span class="nav-username" id="nav-username"></span>
+            <button class="btn-nav-logout" id="nav-logout">Kilépés</button>
+        </div>
+    </div>
+</nav>
+
+<main>
+    <div class="container">
+        <div class="card">
+            <h1 class="page-title">Szavazás</h1>
+            <p class="page-subtitle" id="page-subtitle">Add le a szavazatodat. Egy szavazást csak egyszer lehet leadni.</p>
+            <div class="divider"></div>
+            <!-- Task 11: A form tartalma JavaScript által épül fel dinamikusan -->
+            <div id="form-container"></div>
+        </div>
+    </div>
+</main>
+
+<script src="/js/api.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/vote.js"></script>
+<script>
+    // Alcím frissítése ha konkrét betId van az URL-ben
+    if (new URLSearchParams(window.location.search).get('betId')) {
+        document.getElementById('page-subtitle').textContent = 'Add le a szavazatodat. Egy szavazást csak egyszer lehet leadni.';
+    }
+</script>
+</body>
+</html>

@@ -1,47 +1,58 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hu">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voting System Test</title>
-    <!--
-    FRONTEND ARCHITECTURE NOTES:
-    ============================
-    
-    This is a simple test client. In production:
-    
-    1. SERVING OPTIONS:
-       a) Serve from Express (current setup) - nginx proxies to Express which serves static files
-       b) Serve from nginx directly - faster, add to nginx.conf:
-          location /static/ {
-              root /path/to/web_client;
-          }
-       c) Separate frontend server (React/Vue build) - nginx proxies different paths
-    
-    2. API CALLS:
-       - Always use relative URLs (/api/bet) not absolute (http://localhost:3001/api/bet)
-       - This way nginx handles load balancing transparently
-       - The frontend doesn't know/care which backend instance responds
-    
-    3. STICKY SESSIONS (ip_hash):
-       - With ip_hash: same user always hits same server (good for sessions)
-       - Without ip_hash: round-robin, need shared session store (Redis)
-    
-    
-    -->
+    <title>Szavazó Rendszer</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <h1>Voting System - API Test</h1>
-    
-    <button id="fetchBet">Fetch Current Bet</button>
-    <button id="checkHealth">Check Health</button>
-    <button id="fetchMultiple">Fetch 5x (test load balancing)</button>
-    <button id="voteYes">Vote Yes</button>
-    <button id="voteNo">Vote No</button>
-    
-    <h2>Response:</h2>
-    <pre id="output">Click a button to test the API</pre>
 
-    <script src="app.js"></script>
+<!-- Task 13 - Interaktív dizájn felület: központi oldal -->
+<nav>
+    <a class="nav-brand" href="/index.html">Szavazó Rendszer</a>
+    <div class="nav-links">
+        <a href="/index.html" class="active">Főoldal</a>
+        <a href="/vote.html">Szavazás</a>
+        <a href="/results.html">Eredmények</a>
+        <a href="/admin.html">Admin</a>
+        <a href="/login.html" id="nav-login">Bejelentkezés</a>
+        <a href="/register.html" id="nav-register">Regisztráció</a>
+        <div id="nav-user" style="display:none; align-items:center; gap:8px;">
+            <span class="nav-username" id="nav-username"></span>
+            <button class="btn-nav-logout" id="nav-logout">Kilépés</button>
+        </div>
+    </div>
+</nav>
+
+<main>
+    <div class="container">
+        <div class="hero">
+            <h1>Osztott Szavazó Rendszer</h1>
+            <p>Vegyél részt az aktuális szavazásban, vagy nézd meg az eddigi eredményeket valós időben.</p>
+        </div>
+
+        <div class="action-grid">
+            <a class="action-card" href="/vote.html">
+                <div class="icon">X</div>
+                <h3>Szavazás</h3>
+                <p>Töltsd ki a dinamikus kérdőívet és add le a szavazatodat.</p>
+            </a>
+            <a class="action-card" href="/results.html">
+                <div class="icon">?</div>
+                <h3>Eredmények</h3>
+                <p>Nézd meg az aktuális szavazási eredményeket valós idejű diagramon.</p>
+            </a>
+            <a class="action-card" href="/register.html">
+                <div class="icon">!</div>
+                <h3>Regisztráció</h3>
+                <p>Hozz létre fiókot, hogy bejelentkezve szavazhass.</p>
+            </a>
+        </div>
+    </div>
+</main>
+
+<script src="/js/api.js"></script>
+<script src="/js/auth.js"></script>
 </body>
 </html>

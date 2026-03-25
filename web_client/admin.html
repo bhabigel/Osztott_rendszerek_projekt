@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin – Szavazó Rendszer</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<nav>
+    <a class="nav-brand" href="/index.html">Szavazó Rendszer</a>
+    <div class="nav-links">
+        <a href="/index.html">Főoldal</a>
+        <a href="/vote.html">Szavazás</a>
+        <a href="/results.html">Eredmények</a>
+        <a href="/admin.html" class="active">Admin</a>
+        <a href="/login.html" id="nav-login">Bejelentkezés</a>
+        <a href="/register.html" id="nav-register">Regisztráció</a>
+        <div id="nav-user" style="display:none; align-items:center; gap:8px;">
+            <span class="nav-username" id="nav-username"></span>
+            <button class="btn-nav-logout" id="nav-logout">Kilépés</button>
+        </div>
+    </div>
+</nav>
+
+<main>
+    <div class="container">
+
+        <!-- Új szavazás létrehozása -->
+        <div class="card" style="margin-bottom:24px;">
+            <h1 class="page-title">Új szavazás</h1>
+            <p class="page-subtitle">Adj meg egy kérdést és a lehetséges válaszokat.</p>
+            <div class="divider"></div>
+
+            <div id="create-alert"></div>
+
+            <form id="create-form">
+                <div class="form-group">
+                    <label for="question">Kérdés szövege</label>
+                    <input type="text" id="question" name="question" required
+                           placeholder="pl. Melyik programozási nyelvet szereted a legjobban?" />
+                </div>
+
+                <div class="form-group">
+                    <label for="questionType">Válasz típusa</label>
+                    <select id="questionType" name="questionType">
+                        <option value="choice">Választásos (radio)</option>
+                        <option value="text">Szöveges (szabad szöveg)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="dbType">Adatbázis backend</label>
+                    <select id="dbType" name="dbType">
+                        <option value="mongodb">MongoDB</option>
+                        <option value="mysql">MySQL</option>
+                        <option value="jsonfile">JSON fájl (socket)</option>
+                    </select>
+                </div>
+
+                <div id="options-section" class="form-group">
+                    <label>Lehetséges válaszok <span style="color:var(--text-light);font-weight:400">(min. 2)</span></label>
+                    <div id="options-list"></div>
+                    <button type="button" class="btn btn-secondary" id="add-option-btn" style="margin-top:8px">
+                        + Opció hozzáadása
+                    </button>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="create-btn">Szavazás létrehozása</button>
+            </form>
+        </div>
+
+        <!-- Meglévő szavazások -->
+        <div class="card">
+            <h2 class="page-title" style="font-size:1.25rem">Meglévő szavazások</h2>
+            <div class="divider"></div>
+            <div id="bets-list">
+                <div class="loading"><div class="spinner"></div><p>Betöltés...</p></div>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<script src="/js/api.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/admin.js"></script>
+</body>
+</html>

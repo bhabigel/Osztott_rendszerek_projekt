@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eredmények – Szavazó Rendszer</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<nav>
+    <a class="nav-brand" href="/index.html">Szavazó Rendszer</a>
+    <div class="nav-links">
+        <a href="/index.html">Főoldal</a>
+        <a href="/vote.html">Szavazás</a>
+        <a href="/results.html" class="active">Eredmények</a>
+        <a href="/admin.html">Admin</a>
+        <a href="/login.html" id="nav-login">Bejelentkezés</a>
+        <a href="/register.html" id="nav-register">Regisztráció</a>
+        <div id="nav-user" style="display:none; align-items:center; gap:8px;">
+            <span class="nav-username" id="nav-username"></span>
+            <button class="btn-nav-logout" id="nav-logout">Kilépés</button>
+        </div>
+    </div>
+</nav>
+
+<main>
+    <div class="container">
+        <div class="card">
+            <h1 class="page-title">Eredmények</h1>
+            <p class="page-subtitle" id="page-subtitle">Válassz egy szavazást az eredmények megtekintéséhez.</p>
+            <div class="divider"></div>
+            <!-- Task 12 + 15: eredmények és automatikus frissítés JS által -->
+            <div id="results-container">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Betöltés...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="/js/api.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/results.js"></script>
+<script>
+    if (new URLSearchParams(window.location.search).get('betId')) {
+        document.getElementById('page-subtitle').textContent = 'Automatikusan frissül 5 másodpercenként.';
+    }
+</script>
+</body>
+</html>

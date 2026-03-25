@@ -15,9 +15,9 @@
     "stop:nginx:mac": "brew services stop nginx",
     "restart:nginx:mac": "brew services restart nginx",
     "reload:nginx:mac": "nginx -s reload",
-    "start:nginx:win": "cd C:\\nginx && start nginx",
-    "stop:nginx:win": "cd C:\\nginx && nginx -s quit",
-    "reload:nginx:win": "cd C:\\nginx && nginx -s reload",
+    "start:nginx:win": "powershell -ExecutionPolicy Bypass -File server/nginx-win.ps1 -Action start",
+    "stop:nginx:win": "powershell -ExecutionPolicy Bypass -File server/nginx-win.ps1 -Action stop",
+    "reload:nginx:win": "powershell -ExecutionPolicy Bypass -File server/nginx-win.ps1 -Action reload",
     "start:all:mac": "npm run start:pm2 && npm run start:nginx:mac",
     "stop:all:mac": "npm run stop:nginx:mac && npm run stop:pm2",
     "start:all:win": "npm run start:pm2 && npm run start:nginx:win",
@@ -25,6 +25,8 @@
     "setup:mac": "cd server && chmod +x setup-macos.sh && ./setup-macos.sh",
     "setup:win": "powershell -ExecutionPolicy Bypass -File server/setup-windows.ps1",
     "seed": "node database/seed.js",
+    "start:jsonfile-server": "node database/jsonfile-server/server.js",
+    "start:display": "python display/display.py",
     "health": "curl -s http://localhost:8081/health",
     "test:loadbalance": "for i in 1 2 3 4 5; do curl -s http://localhost:8081/health; echo ''; done"
   },
@@ -41,10 +43,13 @@
   },
   "homepage": "https://github.com/bhabigel/Osztott_rendszerek_projekt#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
-    "mongoose": "^9.3.0"
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^9.3.0",
+    "mysql2": "^3.11.0"
   },
   "devDependencies": {
     "pm2": "^6.0.14"

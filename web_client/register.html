@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regisztráció – Szavazó Rendszer</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<!-- Task 14 - Regisztráció felület -->
+<nav>
+    <a class="nav-brand" href="/index.html">Szavazó Rendszer</a>
+    <div class="nav-links">
+        <a href="/index.html">Főoldal</a>
+        <a href="/vote.html">Szavazás</a>
+        <a href="/results.html">Eredmények</a>
+        <a href="/login.html" id="nav-login">Bejelentkezés</a>
+        <a href="/register.html" class="active" id="nav-register">Regisztráció</a>
+        <div id="nav-user" style="display:none; align-items:center; gap:8px;">
+            <span class="nav-username" id="nav-username"></span>
+            <button class="btn-nav-logout" id="nav-logout">Kilépés</button>
+        </div>
+    </div>
+</nav>
+
+<main>
+    <div class="container-sm">
+        <div class="card">
+            <h1 class="page-title">Regisztráció</h1>
+            <p class="page-subtitle">Hozz létre fiókot a szavazáshoz.</p>
+
+            <div id="register-alert" class="alert"></div>
+
+            <form id="register-form" novalidate>
+                <div class="form-group">
+                    <label for="username">Felhasználónév</label>
+                    <input type="text" id="username" name="username" autocomplete="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email cím</label>
+                    <input type="email" id="email" name="email" autocomplete="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Jelszó <span style="color:var(--text-muted); font-weight:400">(min. 6 karakter)</span></label>
+                    <input type="password" id="password" name="password" autocomplete="new-password" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirm-password">Jelszó megerősítése</label>
+                    <input type="password" id="confirm-password" name="confirm-password" autocomplete="new-password" required>
+                </div>
+                <button type="submit" id="submit-btn" class="btn btn-primary">Regisztráció</button>
+            </form>
+
+            <p class="auth-link">Van már fiókod? <a href="/login.html">Jelentkezz be</a></p>
+        </div>
+    </div>
+</main>
+
+<script src="/js/api.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/register.js"></script>
+</body>
+</html>
