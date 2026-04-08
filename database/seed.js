@@ -10,9 +10,11 @@ require('dotenv').config();
 const path     = require('path');
 const fs       = require('fs');
 const mongoose = require('mongoose');
+const bcrypt   = require('bcryptjs');
 const connectDatabase = require('./connection');
 const Bet  = require('./models/Bet');
 const Vote = require('./models/Vote');
+const User = require('./models/User');
 
 // ── Determinisztikus pszeudo-véletlenszám generátor ───────────────────
 // Így minden seed futásnál ugyanazokat az adatokat kapjuk
@@ -140,8 +142,29 @@ async function seedJsonfileBets(bets) {
     if (added > 0) console.log(`[OK]   JSON-file bets.json: ${added} új szavazás`);
 }
 
+async function seedUsers() {
+    // Admin user
+    const adminExists = await User.findOne({ username: 'admin' });
+    if (!adminExists) {
+        const passwordHash = await bcrypt.hash('admin123', 10);
+        const admin = await User.create({
+            username: 'admin',
+            email: 'admin@example.com',
+            passwordHash,
+            role: 'admin',
+            isActive: true,
+        });
+        console.log(`[OK]   Admin felhasználó létrehozva (admin / admin123)`);
+    } else {
+        console.log(`[SKIP] Admin felhasználó már létezik`);
+    }
+}
+
 async function seed() {
     await connectDatabase();
+
+    // Seed users first
+    await seedUsers();
 
     const bets = await seedBets();
 

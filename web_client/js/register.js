@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const email           = document.getElementById('email').value.trim();
         const password        = document.getElementById('password').value;
         const confirmPassword = document.getElementById('confirm-password').value;
+        const role            = document.querySelector('input[name="role"]:checked').value;
 
         if (password !== confirmPassword) {
             alertEl.className   = 'alert alert-error show';
@@ -32,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const data = await apiFetch('/api/auth/register', {
                 method: 'POST',
-                body: JSON.stringify({ username, email, password }),
+                body: JSON.stringify({ username, email, password, role }),
             });
             setAuth(data.token, data.user);
             window.location.href = '/index.html';

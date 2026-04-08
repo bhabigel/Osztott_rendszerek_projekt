@@ -31,6 +31,25 @@ function authMiddleware(req, _res, next) {
     next();
 }
 
+// ── Admin middleware — csak admin felhasználók ────────────────────────
+
+function adminMiddleware(req, res, next) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ error: 'Hitelesítés szükséges' });
+    }
+    try {
+        const user = jwt.verify(authHeader.slice(7), JWT_SECRET);
+        if (user.role !== 'admin') {
+            return res.status(403).json({ error: 'Admin jogosultság szükséges' });
+        }
+        req.user = user;
+        next();
+    } catch (err) {
+        return res.status(401).json({ error: 'Érvénytelen token' });
+    }
+}
+
 // ── Task 6: RPC a kijelzőnek ──────────────────────────────────────────
 
 function notifyDisplay(question, option, voterName, questionType) {
@@ -50,11 +69,21 @@ app.get('/health', (_req, res) => {
 // ── Auth (Task 14) ────────────────────────────────────────────────────
 
 app.post('/api/auth/register', async (req, res) => {
-    const { username, email, password } = req.body;
+    const { username, email, password, role } = req.body;
     if (!username || !email || !password) return res.status(400).json({ error: 'username, email és password kötelező' });
     if (password.length < 6) return res.status(400).json({ error: 'A jelszónak legalább 6 karakter kell' });
+    
+    // Validate role — only 'user' or 'admin' allowed
+    const validRoles = ['user', 'admin'];
+    const userRole = validRoles.includes(role) ? role : 'user';
+    
     try {
-        const user  = await User.create({ username, email, passwordHash: await bcrypt.hash(password, 10) });
+        const user  = await User.create({ 
+            username, 
+            email, 
+            passwordHash: await bcrypt.hash(password, 10),
+            role: userRole
+        });
         const token = jwt.sign({ userId: user._id, username: user.username, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
         res.status(201).json({ token, user: { id: user._id, username: user.username, role: user.role } });
     } catch (err) {
@@ -107,7 +136,7 @@ app.get('/api/bets/all', async (_req, res) => {
 
 // ── Új szavazás létrehozása ───────────────────────────────────────────
 
-app.post('/api/bets', async (req, res) => {
+app.post('/api/bets', adminMiddleware, async (req, res) => {
     const { question, options, questionType, dbType } = req.body;
     if (!question || !question.trim()) return res.status(400).json({ error: 'A kérdés szövege kötelező' });
     if (questionType !== 'text' && (!Array.isArray(options) || options.length < 2)) {
@@ -129,7 +158,7 @@ app.post('/api/bets', async (req, res) => {
 
 // ── Szavazás lezárása ─────────────────────────────────────────────────
 
-app.patch('/api/bet/:id/close', async (req, res) => {
+app.patch('/api/bet/:id/close', adminMiddleware, async (req, res) => {
     try {
         const bet = await Bet.findByIdAndUpdate(req.params.id, { isActive: false });
         if (!bet) return res.status(404).json({ error: 'Szavazás nem található' });

@@ -23,6 +23,7 @@ function updateNav() {
     const user = getUser();
     const navLogin    = document.getElementById('nav-login');
     const navRegister = document.getElementById('nav-register');
+    const navAdmin    = document.getElementById('nav-admin');
     const navUser     = document.getElementById('nav-user');
     const navUsername = document.getElementById('nav-username');
     const navLogout   = document.getElementById('nav-logout');
@@ -30,11 +31,14 @@ function updateNav() {
     if (user) {
         if (navLogin)    navLogin.style.display    = 'none';
         if (navRegister) navRegister.style.display = 'none';
+        // Admin link csak admin role esetén
+        if (navAdmin)    navAdmin.style.display    = user.role === 'admin' ? '' : 'none';
         if (navUser)     navUser.style.display     = 'flex';
         if (navUsername) navUsername.textContent   = user.username;
     } else {
         if (navLogin)    navLogin.style.display    = '';
         if (navRegister) navRegister.style.display = '';
+        if (navAdmin)    navAdmin.style.display    = 'none';
         if (navUser)     navUser.style.display     = 'none';
     }
 
