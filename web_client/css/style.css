@@ -483,6 +483,58 @@ main {
     text-decoration: underline;
 }
 
+/* ── ROLE SELECTOR ── */
+.role-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 12px;
+}
+
+.role-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 20px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--card);
+    text-decoration: none;
+    color: var(--text);
+}
+
+.role-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
+}
+
+input[type="radio"][name="role"]:checked + .role-card {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+}
+
+.role-icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+}
+
+.role-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.role-desc {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-align: center;
+    line-height: 1.4;
+}
+
 /* ── DIVIDER ── */
 .divider {
     height: 1px;

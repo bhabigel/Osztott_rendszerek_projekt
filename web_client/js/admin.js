@@ -4,6 +4,20 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Hitelesítés ellenőrzése — csak bejelentkezett felhasználók
+    const user = getUser();
+    if (!user) {
+        window.location.href = '/login.html';
+        return;
+    }
+
+    // Opcionálisan: csak admin felhasználók
+    if (user.role !== 'admin') {
+        window.location.href = '/index.html';
+        return;
+    }
+
+    updateNav();
     initOptionsSection();
     loadBetsList();
 

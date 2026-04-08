@@ -15,6 +15,7 @@
         <a href="/index.html">Főoldal</a>
         <a href="/vote.html">Szavazás</a>
         <a href="/results.html">Eredmények</a>
+        <a href="/admin.html" id="nav-admin" style="display:none;">Admin</a>
         <a href="/login.html" id="nav-login">Bejelentkezés</a>
         <a href="/register.html" class="active" id="nav-register">Regisztráció</a>
         <div id="nav-user" style="display:none; align-items:center; gap:8px;">
@@ -49,6 +50,27 @@
                     <label for="confirm-password">Jelszó megerősítése</label>
                     <input type="password" id="confirm-password" name="confirm-password" autocomplete="new-password" required>
                 </div>
+
+                <!-- Role Selection Flashcards -->
+                <div class="form-group">
+                    <label>Válaszd ki a szerepköröd</label>
+                    <div class="role-selector">
+                        <input type="radio" id="role-user" name="role" value="user" checked hidden>
+                        <label for="role-user" class="role-card">
+                            <div class="role-icon">👤</div>
+                            <div class="role-title">Felhasználó</div>
+                            <div class="role-desc">Szavazatok leadása és eredmények megtekintése</div>
+                        </label>
+
+                        <input type="radio" id="role-admin" name="role" value="admin" hidden>
+                        <label for="role-admin" class="role-card">
+                            <div class="role-icon">⚙️</div>
+                            <div class="role-title">Admin</div>
+                            <div class="role-desc">Szavazások kezelése és adminisztráció</div>
+                        </label>
+                    </div>
+                </div>
+
                 <button type="submit" id="submit-btn" class="btn btn-primary">Regisztráció</button>
             </form>
 
