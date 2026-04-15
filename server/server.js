@@ -256,6 +256,17 @@ app.post('/api/vote', authMiddleware, async (req, res) => {
     }
 });
 
+// Task 12
+app.get('/api/active-bet', async (_req, res) => {
+    try {
+        const activeBet = await adapter.getActiveBet();
+        res.json(activeBet || null);
+    } catch (err) {
+        res.status(503).json({ error: `Backend nem elérhető: ${err.message}` });
+    }
+});
+
+
 
 const PORT = process.env.PORT || 3000;
 

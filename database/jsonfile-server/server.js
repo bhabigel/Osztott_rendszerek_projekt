@@ -27,15 +27,6 @@ if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 function betsFile()         { return path.join(DATA_DIR, 'bets.json'); }
 function votesFile(betId)   { return path.join(DATA_DIR, `votes_${betId}.json`); }
 
-app.get('/api/active-bet', async (_req, res) => {
-    try {
-        const activeBet = await adapter.getActiveBet();
-        res.json(activeBet || null);
-    } catch (err) {
-        res.status(503).json({ error: `Backend nem elérhető: ${err.message}` });
-    }
-});
-
 function loadBets() {
     if (!fs.existsSync(betsFile())) return [];
     return JSON.parse(fs.readFileSync(betsFile(), 'utf8'));
