@@ -1,61 +1,105 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Active Bet Results</title>
-    <style>
-        body { font-family: Arial, sans-serif; }
-        .results { margin: 20px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 10px; text-align: left; border: 1px solid #ddd; }
-        th { background-color: #f2f2f2; }
-    </style>
+
+    <!-- ✅ IMPORTANT: USE GLOBAL CSS -->
+    <link rel="stylesheet" href="/css/style.css">
 </head>
+
 <body>
-    <div class="results">
-        <h1>Active Bet Results</h1>
-        <table>
-            <thead>
-                <tr>
-                    <th>Bet ID</th>
-                    <th>Team A</th>
-                    <th>Team B</th>
-                    <th>Odds</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="results-body">
-                <!-- Results will be dynamically loaded here -->
-            </tbody>
-        </table>
+
+<!-- Optional: reuse nav from other pages if you have it -->
+<nav>
+    <a class="nav-brand" href="/index.html">Szavazó Rendszer</a>
+    <div class="nav-links">
+        <a href="/index.html">Főoldal</a>
+        <a href="/vote.html">Szavazás</a>
+        <a href="/results.html" class="active">Eredmények</a>
     </div>
+</nav>
 
-    <script>
-        function fetchResults() {
-            // Simulate fetching results from an API
-            const results = [
-                { id: 1, teamA: 'Team X', teamB: 'Team Y', odds: 1.5, status: 'Active' },
-                { id: 2, teamA: 'Team Z', teamB: 'Team W', odds: 2.0, status: 'Active' }
-            ];
-            const resultsBody = document.getElementById('results-body');
-            resultsBody.innerHTML = '';// Clear previous results
-            results.forEach(result => {
-                const row = `<tr>
-                    <td>${result.id}</td>
-                    <td>${result.teamA}</td>
-                    <td>${result.teamB}</td>
-                    <td>${result.odds}</td>
-                    <td>${result.status}</td>
-                </tr>`;
-                resultsBody.innerHTML += row;
+<main>
+    <div class="container">
+
+        <div class="card">
+
+            <div class="results-header">
+                <div>
+                    <h1 class="results-question">Active Bet Results</h1>
+                    <div class="total-votes">Live results (updates every 5s)</div>
+                </div>
+
+                <span class="live-badge">
+                    <span class="live-dot"></span>
+                    LIVE
+                </span>
+            </div>
+
+            <table class="regional-table">
+                <thead>
+                    <tr>
+                        <th>Bet ID</th>
+                        <th>Option</th>
+                        <th>Votes</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody id="results-body">
+                    <tr>
+                        <td colspan="4">Loading...</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+</main>
+
+<script>
+function fetchResults() {
+    fetch('http://localhost:3000/api/active-bet')
+        .then(res => res.json())
+        .then(data => {
+            const tbody = document.getElementById('results-body');
+            tbody.innerHTML = '';
+
+            if (!data) {
+                tbody.innerHTML = '<tr><td colspan="4">No active bet</td></tr>';
+                return;
+            }
+
+            const votesMap = {};
+            (data.votes || []).forEach(v => {
+                votesMap[v._id] = v.count;
             });
-        }
 
-        // Fetch results every 5 seconds
-        setInterval(fetchResults, 5000);
-        fetchResults(); // Initial fetch
-    </script>
+            (data.options || []).forEach(option => {
+                const count = votesMap[option] || 0;
+
+                const row = `
+                    <tr>
+                        <td>${data.id}</td>
+                        <td>${option}</td>
+                        <td>${count}</td>
+                        <td>${data.isActive ? 'Active' : 'Closed'}</td>
+                    </tr>
+                `;
+
+                tbody.innerHTML += row;
+            });
+        })
+        .catch(err => console.error('Error:', err));
+}
+
+// refresh every 5s
+setInterval(fetchResults, 5000);
+fetchResults();
+</script>
+
 </body>
 </html>

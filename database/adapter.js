@@ -4,6 +4,7 @@
  */
 
 const mongoose = require('mongoose');
+const Bet      = require('./models/Bet');
 const Vote     = require('./models/Vote');
 
 let _mysql = null, _jsonfile = null;
@@ -19,25 +20,6 @@ async function getVotes(dbType, betId) {
         { $group: { _id: '$option', count: { $sum: 1 } } },
     ]);
 }
-
-/** Aktív szavazás lekérdezése szavazatokkal */
-async function getActiveBet(dbType = 'jsonfile') {
-    if (dbType === 'mysql')    return getMysql().getActiveBet();
-    if (dbType === 'jsonfile') return getJsonfile().getActiveBet();
-    
-    // MongoDB
-    const bet = await Bet.findOne({ isActive: true });
-    if (!bet) return null;
-    
-    const votes = await Vote.aggregate([
-        { $match: { betId: bet._id } },
-        { $group: { _id: '$option', count: { $sum: 1 } } },
-    ]);
-    
-    return { ...bet.toObject(), votes };
-}
-
-module.exports = { getVotes, getRegionalResults, hasVoted, recordVote, getActiveBet };
 
 /** Régiónkénti bontás: [{ region, votes: [{option, count}] }] */
 async function getRegionalResults(dbType, betId) {
@@ -98,4 +80,12 @@ async function recordVote(dbType, betId, option, userId, visitorId, region, city
     });
 }
 
-module.exports = { getVotes, getRegionalResults, hasVoted, recordVote };
+async function getActiveBet() {
+    const bet = await Bet.findOne({ isActive: true });
+    if (!bet) return null;
+
+    const votes = await getVotes(bet.dbType, bet._id.toString());
+
+    return { ...bet.toObject(), votes };
+}
+module.exports = { getVotes, getRegionalResults, hasVoted, recordVote, getActiveBet };

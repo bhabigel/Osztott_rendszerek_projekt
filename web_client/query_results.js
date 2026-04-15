@@ -2,7 +2,7 @@
 
 // Function to fetch active bet from the JSON file socket server.
 function fetchActiveBet() {
-    fetch('http://localhost:3000/activeBet') // Change to your socket server URL
+    fetch('http://localhost:3000/active-bet') 
         .then(response => response.json())
         .then(data => {
             displayResults(data);
@@ -12,13 +12,33 @@ function fetchActiveBet() {
 
 // Function to display the fetched results
 function displayResults(data) {
-    const resultsContainer = document.getElementById('results');
-    resultsContainer.innerHTML = ''; // Clear previous results
-    // Assuming data contains required fields. Adjust according to your data structure.
-    const resultsHtml = `<p>Active Bet: ${data.bet}</p><p>Odds: ${data.odds}</p>`;
-    resultsContainer.innerHTML = resultsHtml;
-}
+    const tbody = document.getElementById('results-body');
+    tbody.innerHTML = '';
 
+    if (!data) {
+        tbody.innerHTML = '<tr><td colspan="5">No active bet</td></tr>';
+        return;
+    }
+
+    const votesMap = {};
+    (data.votes || []).forEach(v => {
+        votesMap[v._id] = v.count;
+    });
+
+    (data.options || []).forEach(option => {
+        const count = votesMap[option] || 0;
+
+        const row = `<tr>
+            <td>${data.id}</td>
+            <td>${option}</td>
+            <td>${count}</td>
+            <td>-</td>
+            <td>${data.isActive ? 'Active' : 'Closed'}</td>
+        </tr>`;
+
+        tbody.innerHTML += row;
+    });
+}
 // Refresh results every 5 seconds
 setInterval(fetchActiveBet, 5000);
 

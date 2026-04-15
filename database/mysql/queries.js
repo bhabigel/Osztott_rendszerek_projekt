@@ -41,4 +41,28 @@ async function recordVote(betId, option, voterId, region, city) {
     );
 }
 
-module.exports = { getVoteCounts, getRegionalResults, hasVoted, recordVote };
+async function getActiveBet() {
+    const [bets] = await pool.query(
+        `SELECT id, question, options, question_type, db_type, is_active, created_at
+         FROM bets WHERE is_active = 1 LIMIT 1`
+    );
+    
+    if (!bets.length) return null;
+    
+    const bet = bets[0];
+    const votes = await getVoteCounts(bet.id);
+    
+    return {
+        _id: bet.id,
+        id: bet.id,
+        question: bet.question,
+        options: bet.options ? JSON.parse(bet.options) : [],
+        questionType: bet.question_type,
+        dbType: bet.db_type,
+        isActive: bet.is_active,
+        createdAt: bet.created_at,
+        votes: votes
+    };
+}
+
+module.exports = { getVoteCounts, getRegionalResults, hasVoted, recordVote, getActiveBet };
