@@ -20,6 +20,25 @@ async function getVotes(dbType, betId) {
     ]);
 }
 
+/** Aktív szavazás lekérdezése szavazatokkal */
+async function getActiveBet(dbType = 'jsonfile') {
+    if (dbType === 'mysql')    return getMysql().getActiveBet();
+    if (dbType === 'jsonfile') return getJsonfile().getActiveBet();
+    
+    // MongoDB
+    const bet = await Bet.findOne({ isActive: true });
+    if (!bet) return null;
+    
+    const votes = await Vote.aggregate([
+        { $match: { betId: bet._id } },
+        { $group: { _id: '$option', count: { $sum: 1 } } },
+    ]);
+    
+    return { ...bet.toObject(), votes };
+}
+
+module.exports = { getVotes, getRegionalResults, hasVoted, recordVote, getActiveBet };
+
 /** Régiónkénti bontás: [{ region, votes: [{option, count}] }] */
 async function getRegionalResults(dbType, betId) {
     if (dbType === 'mysql') return getMysql().getRegionalResults(betId);

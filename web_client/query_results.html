@@ -1,0 +1,61 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Active Bet Results</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .results { margin: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; text-align: left; border: 1px solid #ddd; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <div class="results">
+        <h1>Active Bet Results</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Bet ID</th>
+                    <th>Team A</th>
+                    <th>Team B</th>
+                    <th>Odds</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="results-body">
+                <!-- Results will be dynamically loaded here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function fetchResults() {
+            // Simulate fetching results from an API
+            const results = [
+                { id: 1, teamA: 'Team X', teamB: 'Team Y', odds: 1.5, status: 'Active' },
+                { id: 2, teamA: 'Team Z', teamB: 'Team W', odds: 2.0, status: 'Active' }
+            ];
+            const resultsBody = document.getElementById('results-body');
+            resultsBody.innerHTML = '';// Clear previous results
+            results.forEach(result => {
+                const row = `<tr>
+                    <td>${result.id}</td>
+                    <td>${result.teamA}</td>
+                    <td>${result.teamB}</td>
+                    <td>${result.odds}</td>
+                    <td>${result.status}</td>
+                </tr>`;
+                resultsBody.innerHTML += row;
+            });
+        }
+
+        // Fetch results every 5 seconds
+        setInterval(fetchResults, 5000);
+        fetchResults(); // Initial fetch
+    </script>
+</body>
+</html>

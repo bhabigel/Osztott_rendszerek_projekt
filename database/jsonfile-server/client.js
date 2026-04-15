@@ -53,6 +53,11 @@ async function hasVoted(betId, voterId) {
     return sendRequest({ action: 'HAS_VOTED', betId, voterId });
 }
 
+async function getActiveBet() {
+    const data = await sendRequest({ action: 'GET_ACTIVE_BET' });
+    return data || null;
+}
+
 async function recordVote(betId, option, voterId) {
     try {
         await sendRequest({ action: 'RECORD_VOTE', betId, option, voterId });
@@ -66,4 +71,4 @@ async function recordVote(betId, option, voterId) {
     }
 }
 
-module.exports = { getVotes, hasVoted, recordVote };
+module.exports = { getVotes, hasVoted, recordVote, getActiveBet };
