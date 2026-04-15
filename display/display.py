@@ -13,6 +13,8 @@ Inditas:  python display/display.py
 import http.server
 import threading
 import urllib.parse
+import urllib.request
+import json
 import time
 import os
 import sys
@@ -24,6 +26,7 @@ from datetime import datetime
 lock = threading.Lock()
 
 state = {
+    "selected_bet_id": "",
     "question":    "",
     "type":        "choice",   # "choice" | "text"
     "counts":      {},         # { option: count } — feleletvalasztoshoz
@@ -48,6 +51,7 @@ class DisplayHandler(http.server.BaseHTTPRequestHandler):
 
         # ── GET /update — uj szavazat erkezik ─────────────────────────────
         if parsed.path == "/update":
+            bet_id   = p("bet_id")
             nev      = p("nev")      or "Ismeretlen"
             szavazat = p("szavazat")
             kerdes   = p("kerdes")
@@ -59,8 +63,20 @@ class DisplayHandler(http.server.BaseHTTPRequestHandler):
 
             # Feladat 6: utközés kezelese — Lock biztositja az atomicitast
             with lock:
+                selected = state["selected_bet_id"]
+                # Csak a startupnál kivalasztott kerdest figyeli.
+                if selected and bet_id and bet_id != selected:
+                    self._respond(200, "IGNORED")
+                    return
+                # Visszafelé kompatibilitás: ha nincs bet_id, akkor kerdes szovege alapjan szur.
+                if selected and not bet_id and state["question"] and kerdes and kerdes != state["question"]:
+                    self._respond(200, "IGNORED")
+                    return
+
                 if kerdes:
                     state["question"] = kerdes
+                if bet_id:
+                    state["selected_bet_id"] = bet_id
                 state["type"] = tipus
 
                 if tipus == "choice":
@@ -84,7 +100,6 @@ class DisplayHandler(http.server.BaseHTTPRequestHandler):
                 state["text_votes"]  = []
                 state["total"]       = 0
                 state["last_update"] = None
-                state["question"]    = ""
             self._respond(200, "Reset OK")
 
         # ── GET /status — allapot JSON-ban ────────────────────────────────
@@ -170,6 +185,104 @@ def render_text(snap):
         print(f"{idx} {name}: {answer}")
 
 
+def fetch_questions(limit=5):
+    """Lekeri az aktiv kerdeseket a backendrol."""
+    api_candidates = []
+    env_api = os.getenv("VOTING_API_URL", "").strip()
+    if env_api:
+        api_candidates.append(env_api.rstrip("/"))
+    api_candidates.extend(["http://localhost:8081", "http://localhost:3000"])
+
+    last_err = None
+    for base in api_candidates:
+        try:
+            req = urllib.request.Request(f"{base}/api/bets", method="GET")
+            with urllib.request.urlopen(req, timeout=4) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+            if isinstance(data, list):
+                return data[:limit], base
+            last_err = "API valasz nem lista"
+        except Exception as err:
+            last_err = str(err)
+    raise RuntimeError(f"Nem sikerult kerdeslistat lekerni: {last_err}")
+
+
+def choose_question():
+    """Indulaskor 5 kerdes listazasa, valasztas kerdes ID alapjan."""
+    questions, used_api = fetch_questions(limit=5)
+    if not questions:
+        raise RuntimeError("Nincs aktiv kerdes a rendszerben (/api/bets ures).")
+
+    print(c("bold", "\nAktiv kerdesek (max 5):"))
+    for i, q in enumerate(questions, start=1):
+        qtext = str(q.get("question", "")).strip() or "(uress)"
+        qtype = str(q.get("questionType", "choice"))
+        print(f"  {i}. tipus={qtype} | kerdes={qtext}")
+
+    indexed_questions = [q for q in questions if q.get("_id")]
+    if not indexed_questions:
+        raise RuntimeError("A kerdeslistaban nincs ervenyes _id.")
+
+    while True:
+        picked = input("\nIrj be egy sorszamot (1-5): ").strip()
+        if not picked.isdigit():
+            print("Hibas sorszam. Szamot adj meg (pl. 1).")
+            continue
+
+        idx = int(picked)
+        if 1 <= idx <= len(indexed_questions):
+            selected = indexed_questions[idx - 1]
+            return {
+                "id": str(selected.get("_id")),
+                "index": idx,
+                "question": str(selected.get("question", "")),
+                "type": str(selected.get("questionType", "choice")),
+                "api": used_api,
+            }
+        print("Hibas sorszam. Valassz a listaban szereplo sorszamok kozul.")
+
+
+def fetch_current_results(api_base, bet_id, question_type):
+    """A kivalasztott kerdes jelenlegi valaszait tolti be a backendrol."""
+    safe_bet_id = urllib.parse.quote(str(bet_id), safe="")
+    req = urllib.request.Request(f"{api_base}/api/bet/{safe_bet_id}", method="GET")
+    with urllib.request.urlopen(req, timeout=4) as resp:
+        data = json.loads(resp.read().decode("utf-8"))
+
+    raw_votes = data.get("votes", []) if isinstance(data, dict) else []
+    counts = {}
+    total = 0
+    for row in raw_votes:
+        option = str(row.get("_id", ""))
+        try:
+            cnt = int(row.get("count", 0))
+        except Exception:
+            cnt = 0
+        if not option or cnt <= 0:
+            continue
+        counts[option] = counts.get(option, 0) + cnt
+        total += cnt
+
+    text_votes = []
+    if question_type == "text" and counts:
+        # A backend itt aggregalt adatot ad; szintetikus "Korabbi" elemekkel toltjuk a listat.
+        remaining = 20
+        for option, cnt in sorted(counts.items(), key=lambda x: -x[1]):
+            take = min(cnt, remaining)
+            text_votes.extend([("Korabbi", option)] * take)
+            remaining -= take
+            if remaining <= 0:
+                break
+
+    return {
+        "counts": counts,
+        "text_votes": text_votes,
+        "total": total,
+        "question": str(data.get("question", "")) if isinstance(data, dict) else "",
+        "type": str(data.get("questionType", question_type)) if isinstance(data, dict) else question_type,
+    }
+
+
 def display_loop():
     """
     Feladat 15: folyamatos ujrarajzolas — 1 masodpercenkent fut
@@ -179,6 +292,7 @@ def display_loop():
         with lock:
             snap = {
                 "question":   state["question"],
+                "selected_bet_id": state["selected_bet_id"],
                 "type":       state["type"],
                 "counts":     dict(state["counts"]),
                 "text_votes": list(state["text_votes"]),
@@ -193,6 +307,7 @@ def display_loop():
         print(c("bold", c("purple", "  SZAVAZO RENDSZER — KIJELZO")))
         print(c("bold", "=" * W))
         print()
+        print(c("gray", f"  Figyelt kerdes id: {snap['selected_bet_id'] or '-'}"))
 
         if snap["question"]:
             print(c("bold", "  Kerdes: ") + c("yellow", snap["question"]))
@@ -228,6 +343,30 @@ def display_loop():
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 5001
 
 if __name__ == "__main__":
+    try:
+        selected = choose_question()
+    except Exception as err:
+        print(f"Kijelzo indulasa sikertelen: {err}")
+        sys.exit(1)
+
+    preloaded = None
+    try:
+        preloaded = fetch_current_results(selected["api"], selected["id"], selected["type"])
+    except Exception as err:
+        print(f"Figyelmeztetes: a korabbi valaszok betoltese sikertelen ({err}).")
+
+    with lock:
+        state["selected_bet_id"] = selected["id"]
+        state["question"] = selected["question"]
+        state["type"] = selected["type"]
+        if preloaded:
+            state["question"] = preloaded["question"] or state["question"]
+            state["type"] = preloaded["type"] or state["type"]
+            state["counts"] = preloaded["counts"]
+            state["text_votes"] = preloaded["text_votes"]
+            state["total"] = preloaded["total"]
+            state["last_update"] = datetime.now().strftime("%H:%M:%S") if preloaded["total"] > 0 else None
+
     # Feladat 15: display frissito thread (daemon — program vegevel leall)
     t = threading.Thread(target=display_loop, daemon=True)
     t.start()
@@ -239,7 +378,8 @@ if __name__ == "__main__":
     # Kis varakozas, hogy a display loop elinduljon a szerver uzenet elott
     time.sleep(0.3)
     print(f"Kijelzo HTTP szerver indul a {PORT} porton...")
-    print("Vegpont: GET /update?nev=X&szavazat=Y&kerdes=Z&tipus=choice")
+    print("Vegpont: GET /update?bet_id=ID&nev=X&szavazat=Y&kerdes=Z&tipus=choice")
+    print("A kijelzo csak a kivalasztott kerdes id-jat figyeli.")
     print("Leallitas: Ctrl+C\n")
 
     try:

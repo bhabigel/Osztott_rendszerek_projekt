@@ -27,7 +27,7 @@
     "start": "concurrently --names \"WEB,JSONFILE,DISPLAY\" --prefix-colors \"cyan,yellow,green\" \"node server/server.js\" \"node database/jsonfile-server/server.js\" \"python display/display.py\"",
     "seed": "node database/seed.js",
     "start:jsonfile-server": "node database/jsonfile-server/server.js",
-    "start:display": "python display/display.py",
+    "start:display": "python3 display/display.py",
     "health": "curl -s http://localhost:8081/health",
     "test:loadbalance": "for i in 1 2 3 4 5; do curl -s http://localhost:8081/health; echo ''; done"
   },

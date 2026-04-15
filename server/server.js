@@ -52,8 +52,14 @@ function adminMiddleware(req, res, next) {
 
 // ── Task 6: RPC a kijelzőnek ──────────────────────────────────────────
 
-function notifyDisplay(question, option, voterName, questionType) {
-    const params  = new URLSearchParams({ nev: voterName || 'Névtelen', szavazat: option, kerdes: question || '', tipus: questionType || 'choice' });
+function notifyDisplay(betId, question, option, voterName, questionType) {
+    const params  = new URLSearchParams({
+        bet_id: betId || '',
+        nev: voterName || 'Névtelen',
+        szavazat: option,
+        kerdes: question || '',
+        tipus: questionType || 'choice',
+    });
     const urlObj  = new URL(DISPLAY_URL);
     const req = http.get({ hostname: urlObj.hostname, port: urlObj.port || 80, path: `/update?${params}` }, () => {});
     req.on('error', () => {});
@@ -244,7 +250,7 @@ app.post('/api/vote', authMiddleware, async (req, res) => {
         await adapter.recordVote(bet.dbType, betId, option, userId, visitorId, region, city);
 
         // Task 6: RPC a kijelzőnek
-        notifyDisplay(bet.question, option, voterName, bet.questionType);
+        notifyDisplay(bet._id.toString(), bet.question, option, voterName, bet.questionType);
 
         res.json({ success: true, message: `Szavazat leadva: "${option}"` });
     } catch (err) {
